@@ -1,0 +1,16 @@
+# PyInstaller and Python Environment Exclusions
+dist/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.spec
+
+# OS Exclusions
+.DS_Store
+
+.idea
+
+# Temporary Files
+temp_youtube_downloads/

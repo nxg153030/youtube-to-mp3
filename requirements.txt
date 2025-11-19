@@ -1,0 +1,14 @@
+decorator==5.2.1
+imageio==2.37.2
+imageio-ffmpeg==0.6.0
+moviepy==2.2.1
+numpy==2.0.2
+pillow==11.3.0
+proglog==0.1.12
+pyside6==6.10.0
+pyside6-addons==6.10.0
+pyside6-essentials==6.10.0
+python-dotenv==1.2.1
+shiboken6==6.10.0
+tqdm==4.67.1
+yt-dlp==2025.10.14
