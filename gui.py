@@ -1,38 +1,16 @@
 import os
 import sys
+import time
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QLabel, QHBoxLayout, QMessageBox, QFileDialog,
     QProgressBar
 )
 from PySide6.QtCore import Qt, QThread, Signal, QObject
-from yt_dlp import YoutubeDL
 from moviepy import VideoFileClip
-import time
+from youtube_to_mp3 import download_youtube_video
+
 
 TEMP_DIR = "temp_youtube_downloads"
-
-
-def download_youtube_video(url, output_path):
-    """Download the YouTube video using yt-dlp."""
-    # 1. Setup the filename template
-    # This tells yt-dlp to save the file in the output_path and gives it a specific filename pattern
-    ydl_opts = {
-        # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', # Get best video/audio and combine
-        'format': 'best',  # For simplicity, let yt-dlp pick the best combined format (usually mp4)
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'noplaylist': True,  # Ensure we only download a single video
-        'quiet': True,  # Suppress command-line output
-        'no_warnings': True,
-    }
-
-    # 2. Execute the download
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        # yt-dlp returns the full info dictionary. We need the actual file path.
-        # This is the expected path after successful download
-        filename = ydl.prepare_filename(info)
-
-    return filename
 
 
 def convert_to_mp3(input_file, output_file):
