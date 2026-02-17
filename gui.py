@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import tempfile
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QLabel, QHBoxLayout, QMessageBox, QFileDialog,
     QProgressBar
@@ -10,7 +11,7 @@ from moviepy import VideoFileClip
 from youtube_to_mp3 import download_youtube_video
 
 
-TEMP_DIR = "temp_youtube_downloads"
+TEMP_DIR = os.path.join(tempfile.gettempdir(), "ytdownloader_temp")
 
 
 def convert_to_mp3(input_file, output_file):
