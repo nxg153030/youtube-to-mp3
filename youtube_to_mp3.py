@@ -17,23 +17,39 @@ def check_and_update_ytdlp():
         print(f"Failed to update yt-dlp: {e}")
 
 
-def download_youtube_video(url, output_path):
-    """Download the YouTube video using yt-dlp."""
+def download_youtube_video(url, output_path, progress_callback=None):
+    """
+    Download the YouTube video using yt-dlp.
+    progress_callback: A function that accepts the progress dictionary from yt-dlp.
+    """
+    def ytdl_hook(d):
+        if d["status"] == "downloading":
+            if d.get("total_bytes"):
+                p = d["downloaded_bytes"] / d["total_bytes"] * 100
+                if progress_callback:
+                    progress_callback(int(p), "Downloading...")
+                elif d.get("total_bytes_estimate"):
+                    p = d["downloaded_bytes"] / d["total_bytes_estimate"] * 100
+                    if progress_callback:
+                        progress_callback(int(p), "Downloading...")
+        elif d["status"] == "finished":
+            if progress_callback:
+                progress_callback(100, "Download complete, Converting...")
+
     ydl_opts = {
-        # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', # Get best video/audio and combine
         'format': 'best',  # For simplicity, let yt-dlp pick the best combined format (usually mp4)
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
         'noplaylist': True,  # Ensure we only download a single video
         'quiet': True,  # Suppress command-line output
         'no_warnings': True,
-        'nocheckcertificate': True, # Ignore SSL errors
-        'ignoreerrors': True, # Skip errors and continue
+        'nocheckcertificate': True,
+        'ignoreerrors': True,
+        "progress_hooks": [ytdl_hook]
     }
+
     try:
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
-            # yt-dlp returns the full info dictionary. We need the actual file path.
-            # This is the expected path after successful download
             filename = ydl.prepare_filename(info)
     except Exception as e:
         # Re-raise the exception so the GUI can catch it and show the error.

@@ -40,28 +40,33 @@ class DownloadWorker(QObject):
         """The main task function that runs in the background thread."""
         mp4_path = None
         try:
-            self.progress_update.emit("Starting download (0/100)...")
+            def progress_bridge(percent, status_text):
+                scaled_percent = int(percent * 0.8)
+                self.progress_value.emit(scaled_percent)
+                self.progress_update.emit(status_text)
+
+            self.progress_update.emit("Starting download...")
             # NOTE: pytube/yt-dlp doesn't have a simple callback for progress.
             # We will split the 100% manually: 1-40% for download, 41-100% for conversion.
-            self.report_progress(10)
-            time.sleep(0.1) # for smoothness
 
             # 1. Download the MP4 file
-            mp4_path = download_youtube_video(self.url, TEMP_DIR)
-            self.report_progress(40)
-            self.progress_update.emit(f"Download complete (40/100): Starting conversion...")
-            time.sleep(0.1)
+            mp4_path = download_youtube_video(self.url, TEMP_DIR, progress_bridge)
 
+            self.progress_update.emit(f"Download complete. Starting conversion...")
+            self.progress_value.emit(80)
+
+            # 2. Convert to MP3
             base_name = os.path.splitext(os.path.basename(mp4_path))[0]
             mp3_output_path = os.path.join(self.save_location, f"{base_name}.mp3")
 
-            self.progress_update.emit(f"Converting to MP3: {os.path.basename(mp3_output_path)}...")
+            self.progress_update.emit(f"Converting audio...")
+            self.progress_value.emit(90)
 
-            self.report_progress(60)
-            time.sleep(0.1)
             convert_to_mp3(mp4_path, mp3_output_path)
-            self.report_progress(100)
-            self.progress_update.emit("Conversion finished successfully!")
+
+            self.progress_value.emit(100)
+            self.progress_update.emit("All Done!")
+
         except Exception as e:
             error_message = f"An error occured: {str(e)}"
             self.error.emit(error_message)
@@ -84,6 +89,7 @@ class YouTubeConverterApp(QWidget):
         self.worker = None
 
         self.init_ui()
+        self.apply_styles()
 
     def init_ui(self):
         main_layout = QVBoxLayout()
@@ -117,6 +123,61 @@ class YouTubeConverterApp(QWidget):
         # Apply the main layout to the window
         self.setLayout(main_layout)
         self.setGeometry(300, 300, 500, 180)  # x, y, width, height
+    
+    def apply_styles(self):
+        # A modern "Dark Mode" theme
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #2b2b2b;
+                color: #ffffff;
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 14px;
+            }
+            QLineEdit {
+                background-color: #3b3b3b;
+                border: 1px solid #555;
+                border-radius: 5px;
+                padding: 8px;
+                color: #fff;
+                selection-background-color: #3daee9;
+            }
+            QLineEdit:focus {
+                border: 1px solid #3daee9;
+            }
+            QPushButton {
+                background-color: #3daee9;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 15px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #4dbef9;
+            }
+            QPushButton:pressed {
+                background-color: #2c9cd7;
+            }
+            QPushButton:disabled {
+                background-color: #555;
+                color: #888;
+            }
+            QProgressBar {
+                border: 1px solid #444;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #3b3b3b;
+                height: 20px;
+            }
+            QProgressBar::chunk {
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
+                                                  stop:0 #3daee9, stop:1 #5fdfff);
+                border-radius: 4px;
+            }
+            QLabel {
+                color: #cccccc;
+            }
+        """)
 
     def reset_ui_state(self):
         self.progress_bar.setValue(0)
