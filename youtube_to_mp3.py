@@ -45,6 +45,7 @@ def download_youtube_video(url, output_path, progress_callback=None, start_sec=N
         'no_warnings': True,
         'nocheckcertificate': True,
         'ignoreerrors': True,
+        'source_address': '0.0.0.0',
         "progress_hooks": [ytdl_hook]
     }
 
