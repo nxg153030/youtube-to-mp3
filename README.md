@@ -1,48 +1,37 @@
-# 🎶 YouTube to MP3 Converter (macOS Desktop App)
+# YouTube Downloader for macOS
 
-A simple, standalone desktop application built with Python and PySide6 that allows users to paste a YouTube URL and convert the video's audio track into a downloadable MP3 file. The core download functionality is handled by the robust `yt-dlp` library, ensuring reliable performance against YouTube's frequent API changes.
+A macOS desktop app for downloading YouTube videos as MP4, extracting audio as MP3, or saving both. It uses `yt-dlp` to fetch media and PySide6 for the interface.
 
-The application is packaged as a single `.app` bundle for macOS for easy distribution and use.
+## Features
 
-## ✨ Features
+- Download audio as MP3, video as MP4, or both.
+- Queue multiple URLs or import a shared note.
+- Optionally download a clip using start and end timestamps.
+- Track item and overall progress while downloads run in the background.
+- Package the app as a standalone macOS application with PyInstaller.
 
-* **Simple GUI:** Clean interface built with PySide6 (Qt) for a native macOS look and feel.
-* **Reliable Download:** Uses the actively maintained `yt-dlp` library for robust video fetching.
-* **Threaded Processing:** Download and conversion happen in the background thread, keeping the UI responsive.
-* **Progress Feedback:** Displays a progress bar and status messages during the download and conversion process.
-* **Automatic Cleanup:** Automatically removes the temporary MP4 video file after successful MP3 conversion.
-* **Standalone App:** Packaged using PyInstaller for zero dependency installation on the user's macOS machine.
+## Install
 
-## 🚀 Installation (For End Users)
+1. Download `YouTubeDownloader.zip` from the project's GitHub Releases page.
+2. Unzip the download and move `YouTubeDownloader.app` to Applications.
+3. On first launch, macOS may block the unsigned app. Control-click the app and choose **Open**, then confirm **Open** in the dialog. If that option is unavailable, go to **System Settings > Privacy & Security** and choose **Open Anyway** for the app.
 
-Since this application is packaged as a standalone bundle, installation is simple:
+## Use
 
-1.  **Download:** Download the latest release of the `MP3 Converter.app.zip` file from the [Releases page](LINK_TO_YOUR_RELEASES_PAGE_HERE).
-2.  **Extract:** Unzip the file to get the `MP3 Converter.app` application.
-3.  **Install:** Drag the `MP3 Converter.app` file into your Mac's **`/Applications`** folder.
-4.  **First Run:** The first time you run the app, macOS may show a security warning. To bypass this: **Right-click** the app icon and select **"Open"**. Click **"Open"** again in the resulting dialog.
+1. Paste a YouTube URL and add it to the queue, or import a shared note.
+2. To download a clip, enable **Clip Video (Timestamps)** and enter its start and end times.
+3. Choose **Audio Only (MP3)**, **Video Only (MP4)**, or **Both (MP3 + MP4)**.
+4. Select an output folder and start the download.
 
-## 💻 Usage
+## Run from source
 
-1.  **Paste URL:** Copy the URL of the YouTube video you want to convert.
-2.  **Run App:** Launch the **MP3 Converter** app.
-3.  **Click Download:** Paste the URL into the input field and click **"Download & Convert to MP3"**.
-4.  **Select Location:** A dialog will pop up asking you to choose the destination folder for the final MP3 file.
-5.  **Wait:** The status bar and progress bar will update as the video is downloaded and converted.
-6.  **Done:** Once complete, the status will show "Conversion finished successfully!", and your MP3 file will be in the selected folder.
-
-## ⚙️ Development & Building (For Developers)
-
-If you wish to run the app directly from the source code or rebuild the executable, follow these steps.
-
-### Prerequisites
-
-You need **Python 3.10+** (Python 3.12 is recommended) and the following libraries:
+Python 3.10 or later is required. From the project directory:
 
 ```bash
-# Set up a virtual environment (recommended)
 python3 -m venv venv
 source venv/bin/activate
+python -m pip install -r requirements.txt
+python gui.py
+```
 
-# Install dependencies
-pip install PySide6 yt-dlp moviepy
+For build and release instructions, see [DEVELOPER.md](DEVELOPER.md).
