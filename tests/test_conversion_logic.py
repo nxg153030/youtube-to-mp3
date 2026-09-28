@@ -1,6 +1,7 @@
 import unittest
 import os
 import shutil
+import imageio_ffmpeg
 from unittest.mock import patch, MagicMock
 
 from gui import download_youtube_video, convert_to_mp3, TEMP_DIR
@@ -13,6 +14,21 @@ TEST_OUTPUT_DIR = "test_output"
 
 class TestConversionLogic(unittest.TestCase):
     """Unit tests for the download and conversion functions."""
+
+    def test_download_uses_mergeable_formats(self):
+        mock_ydl = MagicMock()
+        mock_ydl.__enter__.return_value = mock_ydl
+        mock_ydl.extract_info.return_value = {"id": "test", "title": "test"}
+        mock_ydl.prepare_filename.return_value = os.path.join(TEMP_DIR, "test.mp4")
+
+        with patch("youtube_to_mp3.YoutubeDL", return_value=mock_ydl) as youtube_dl:
+            result = download_youtube_video("https://www.youtube.com/watch?v=test", TEMP_DIR)
+
+        options = youtube_dl.call_args.args[0]
+        self.assertIn("bestvideo*+bestaudio/best", options["format"])
+        self.assertEqual(options["merge_output_format"], "mp4")
+        self.assertEqual(options["ffmpeg_location"], imageio_ffmpeg.get_ffmpeg_exe())
+        self.assertEqual(result, os.path.join(TEMP_DIR, "test.mp4"))
 
     @classmethod
     def setUpClass(cls):

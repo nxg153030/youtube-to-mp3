@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import imageio_ffmpeg
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import download_range_func
 
@@ -38,7 +39,9 @@ def download_youtube_video(url, output_path, progress_callback=None, start_sec=N
                 progress_callback(100, "Download complete, Converting...")
 
     ydl_opts = {
-        'format': 'best',  # For simplicity, let yt-dlp pick the best combined format (usually mp4)
+        'format': 'bestvideo*[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/bestvideo*+bestaudio/best',
+        'merge_output_format': 'mp4',
+        'ffmpeg_location': imageio_ffmpeg.get_ffmpeg_exe(),
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
         'noplaylist': True,  # Ensure we only download a single video
         'quiet': True,  # Suppress command-line output
